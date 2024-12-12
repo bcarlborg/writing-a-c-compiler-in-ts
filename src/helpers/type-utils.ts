@@ -48,7 +48,9 @@ export function unreachable(
         stringified += ` (Not serializable: ${jsonErrorMessage})`;
       }
     }
-  } catch {}
+  } catch {
+    console.error("Unreachable: Failed to stringify value", never);
+  }
 
   throw new CompilerError(
     stage,

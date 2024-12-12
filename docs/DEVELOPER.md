@@ -4,15 +4,15 @@ This project contains the source, tests, and build system for my implementation 
 
 ## Project Dependencies
 
-`npm`
-
-- Currently I am using version `9.6.7`.
-- Used to install modules for our compiler source code.
-
 `node`
 
-- Currently on version `v18.17.0`.
+- Currently on version `v22.12.0`.
 - Runtime for our compiler.
+
+`npm`
+
+- Currently I am using version `10.9.0`.
+- Used to install modules for our compiler source code.
 
 `node_modules`
 

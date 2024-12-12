@@ -1,6 +1,4 @@
-import fs from "node:fs";
-
-import { CompilerError, debugLog } from "./helpers/logging";
+import { CompilerError } from "./helpers/logging";
 import { parseAndValidateCommandLineArgs } from "./parse-and-validate-command-line-args";
 
 try {
@@ -13,12 +11,12 @@ try {
 
 function main() {
   const {
-    cliOptionStopAfterLex,
-    cliOptionStopAfterParse,
-    cliOptionStopAfterCodegen,
-    cliOptionDebug,
-    cliOptionOutputPath,
-    cliOptionInputPath,
-    sourceText,
+    cliOptionStopAfterLex: _cliOptionStopAfterLex,
+    cliOptionStopAfterParse: _cliOptionStopAfterParse,
+    cliOptionStopAfterCodegen: _cliOptionStopAfterCodegen,
+    cliOptionDebug: _cliOptionDebug,
+    cliOptionOutputPath: _cliOptionOutputPath,
+    cliOptionInputPath: _cliOptionInputPath,
+    sourceText: _sourceText,
   } = parseAndValidateCommandLineArgs();
 }
