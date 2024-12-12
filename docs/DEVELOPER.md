@@ -40,5 +40,6 @@ The main project directories:
 - Running all unit tests: `npm run test-all` or `npx jest`
 - Running a specific unit test: `npx jest ./path/to/test/file.test.ts`
 - Running the tests provided by the book: `./writing-a-c-compiler-tests/test-compiler`
+- Lint: `npx eslint` or `npm run lint`
 - Executing the compiler: `./bin/compiler [args] input_file`
-- Running programs from the compiler (if not on x86-64 machine): `arch -x86_64 zsh` then simply run the executable
+- (Apple silicon) Running programs from the compiler if not on x86-64 machine: `arch -x86_64 zsh` then simply run the executable
