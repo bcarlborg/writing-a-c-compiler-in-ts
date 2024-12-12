@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Get the directory where this script is located.
+# BASH_SOURCE[0] contains the path to the currently executing script.
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# Construct path to the index.js file relative to this script
+# We do this so that even if the script is called from a different directory
+# or through symlinks,  we can still find the correct path to index.js
+INDEX_FILE="$SCRIPT_DIR/../dist/index.js"
+
+# if index.js does not exist, error out and indicate that the project
+# has not been built
+if [ ! -f "$INDEX_FILE" ]; then
+    echo "Error: Could not find $INDEX_FILE"
+    echo "Have you built the project with 'npm run build'?"
+    exit 1
+fi
+
+# Execute index.js with Node, passing all command line arguments
+# $@ expands to all command line arguments preserving quotes and spaces
+node "$INDEX_FILE" "$@"
