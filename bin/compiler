@@ -1,5 +1,40 @@
 #!/bin/bash
 
+# Tells bash to exit if any command fails
+set -e
+
+###########################################################################
+# Validate the input file arg
+###########################################################################
+
+# Get the input file (last argument)
+INPUT_C_FILE="${!#}"
+
+# Check if an argument was provided
+if [ -z "$INPUT_C_FILE" ]; then
+    echo "Error: No input file provided"
+    echo "Usage: $0 <input_file.c>"
+    exit 1
+fi
+
+# Check if the file exists
+if [ ! -f "$INPUT_C_FILE" ]; then
+    echo "Error: File '$INPUT_C_FILE' does not exist"
+    exit 1
+fi
+
+# Check if file ends with .c
+if [[ "$INPUT_C_FILE" != *.c ]]; then
+    echo "Error: Input file must have .c extension"
+    echo "Got: $INPUT_C_FILE"
+    exit 1
+fi
+
+
+###########################################################################
+# Find the JS source file for our compiler
+###########################################################################
+
 # Get the directory where this script is located.
 # BASH_SOURCE[0] contains the path to the currently executing script.
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -17,6 +52,44 @@ if [ ! -f "$INDEX_FILE" ]; then
     exit 1
 fi
 
-# Execute index.js with Node, passing all command line arguments
-# $@ expands to all command line arguments preserving quotes and spaces
-node "$INDEX_FILE" "$@"
+###########################################################################
+# Drive the compiler using our home brewed compiler for compilation and
+# gcc for preprocessing, assembling, and linking
+###########################################################################
+
+# Create paths for intermediate files and the executable
+PREPROCESSED_FILE="${INPUT_C_FILE%.c}.i"
+ASSEMBLY_FILE="${INPUT_C_FILE%.c}.s"
+EXECUTABLE_FILE="${INPUT_C_FILE%.c}"
+
+# Preprocess the input file using GCC
+gcc -E -P "$INPUT_C_FILE" -o "$PREPROCESSED_FILE"
+
+# Parse the known command line options
+OPTIONS=""
+if [[ "$*" == *"--lex"* ]]; then
+    OPTIONS="$OPTIONS --lex"
+fi
+if [[ "$*" == *"--parse"* ]]; then
+    OPTIONS="$OPTIONS --parse"
+fi
+if [[ "$*" == *"--codegen"* ]]; then
+    OPTIONS="$OPTIONS --codegen"
+fi
+if [[ "$*" == *"--debug"* ]]; then
+    OPTIONS="$OPTIONS --debug"
+fi
+
+# Compile the preprocessed file using our home brewed compiler (wow)
+# shellcheck disable=SC2086  # TODO -- figure out how to fix this (so that we can quote options)
+node "$INDEX_FILE" $OPTIONS --output="$ASSEMBLY_FILE" --input="$PREPROCESSED_FILE"
+
+# Only assemble and link if -S was not passed
+if [[ "$*" != *"-S"* ]]; then
+    # Assemble and link by invoking GCC
+    gcc -o "$EXECUTABLE_FILE" "$ASSEMBLY_FILE"
+fi
+
+# Clean up the preprocessed file
+rm -f "$PREPROCESSED_FILE" "$ASSEMBLY_FILE"
+
