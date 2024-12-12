@@ -1,5 +1,6 @@
 import { CompilerError } from "./helpers/logging";
 import { parseAndValidateCommandLineArgs } from "./parse-and-validate-command-line-args";
+import { lex } from "./lexer";
 
 try {
   main();
@@ -11,12 +12,18 @@ try {
 
 function main() {
   const {
-    cliOptionStopAfterLex: _cliOptionStopAfterLex,
+    cliOptionStopAfterLex,
     cliOptionStopAfterParse: _cliOptionStopAfterParse,
     cliOptionStopAfterCodegen: _cliOptionStopAfterCodegen,
     cliOptionDebug: _cliOptionDebug,
     cliOptionOutputPath: _cliOptionOutputPath,
     cliOptionInputPath: _cliOptionInputPath,
-    sourceText: _sourceText,
+    sourceText,
   } = parseAndValidateCommandLineArgs();
+
+  const _tokens = lex(sourceText);
+
+  if (cliOptionStopAfterLex) {
+    return;
+  }
 }

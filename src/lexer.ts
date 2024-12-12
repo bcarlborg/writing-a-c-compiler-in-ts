@@ -1,3 +1,5 @@
+import { debugLog } from "./helpers/logging";
+
 type Token =
   | {
       type: "identifier";
@@ -34,7 +36,9 @@ type Token =
 
 export const lex = (sourceText: string): Token[] => {
   const lexer = new Lexer(sourceText);
-  return lexer.lex();
+  const tokens = lexer.lex();
+  debugLog("lex", "lexing source text complete");
+  return tokens;
 };
 
 class Lexer {
