@@ -1,4 +1,6 @@
-import { CompilerError } from "./helpers/logging";
+import fs from "node:fs";
+
+import { CompilerError, debugLog } from "./helpers/logging";
 import { parseAndValidateCommandLineArgs } from "./parse-and-validate-command-line-args";
 
 try {
@@ -17,5 +19,6 @@ function main() {
     cliOptionDebug,
     cliOptionOutputPath,
     cliOptionInputPath,
+    sourceText,
   } = parseAndValidateCommandLineArgs();
 }

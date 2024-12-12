@@ -12,20 +12,20 @@ INPUT_C_FILE="${!#}"
 
 # Check if an argument was provided
 if [ -z "$INPUT_C_FILE" ]; then
-    echo "Error: No input file provided"
+    echo "Compiler Driver Error: No input file provided"
     echo "Usage: $0 <input_file.c>"
     exit 1
 fi
 
 # Check if the file exists
 if [ ! -f "$INPUT_C_FILE" ]; then
-    echo "Error: File '$INPUT_C_FILE' does not exist"
+    echo "Compiler Driver Error: File '$INPUT_C_FILE' does not exist"
     exit 1
 fi
 
 # Check if file ends with .c
 if [[ "$INPUT_C_FILE" != *.c ]]; then
-    echo "Error: Input file must have .c extension"
+    echo "Compiler Driver Error: Input file must have .c extension"
     echo "Got: $INPUT_C_FILE"
     exit 1
 fi
@@ -47,7 +47,7 @@ INDEX_FILE="$SCRIPT_DIR/../dist/index.js"
 # if index.js does not exist, error out and indicate that the project
 # has not been built
 if [ ! -f "$INDEX_FILE" ]; then
-    echo "Error: Could not find $INDEX_FILE"
+    echo "Compiler Driver Error: Could not find $INDEX_FILE"
     echo "Have you built the project with 'npm run build'?"
     exit 1
 fi

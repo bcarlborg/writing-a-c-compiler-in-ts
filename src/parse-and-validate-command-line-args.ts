@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import argv from "process.argv";
 import { CompilerError, debugLog } from "./helpers/logging";
 import { setDebug } from "./helpers/logging";
@@ -64,6 +65,19 @@ export const parseAndValidateCommandLineArgs = () => {
 
   debugLog("cliArgs", "Finished parsing command line arguments");
 
+  let sourceText: string;
+  try {
+    sourceText = fs.readFileSync(config.input, "utf8");
+  } catch (error: unknown) {
+    throw new CompilerError(
+      "cliArgs",
+      `Failed to read input file: ${config.input}`,
+      error instanceof Error ? error : undefined
+    );
+  }
+
+  debugLog("cliArgs", "input source file read successfully");
+
   return {
     cliOptionStopAfterLex: config.lex,
     cliOptionStopAfterParse: config.parse,
@@ -71,5 +85,6 @@ export const parseAndValidateCommandLineArgs = () => {
     cliOptionDebug: config.debug,
     cliOptionOutputPath: config.output,
     cliOptionInputPath: config.input,
+    sourceText,
   };
 };

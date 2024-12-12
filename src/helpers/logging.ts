@@ -1,13 +1,9 @@
-export type CompilerStage =
-  | "cliArgs"
-  | "lex"
-  | "parse"
-  | "codegen"
-  | "codeEmission";
-
 // ======================================================================
 // Debugging logging helpers
 // ======================================================================
+
+import { CompilerStage } from "./constants";
+import { unreachable } from "./type-utils";
 
 let isDebuggingEnabled = false;
 
@@ -30,34 +26,42 @@ export function debugLog(stage: CompilerStage, message: string) {
 // ======================================================================
 
 export class CompilerError<T extends CompilerStage> extends Error {
-  constructor(public type: T, public message: string) {
+  constructor(public stage: T, public message: string, public cause?: Error) {
     super(message);
   }
 
-  public static from<T extends CompilerStage>(type: T, message: string) {
-    return new CompilerError(type, message);
+  public static from<T extends CompilerStage>(
+    stage: T,
+    message: string,
+    cause?: Error
+  ) {
+    return new CompilerError(stage, message, cause);
   }
 
   public report() {
     let prefix = "Fatal error during ";
 
-    if (this.type === "cliArgs") {
+    if (this.stage === "cliArgs") {
       prefix += "command line argument parsing";
-    } else if (this.type === "lex") {
+    } else if (this.stage === "lex") {
       prefix += "lexing";
-    } else if (this.type === "parse") {
+    } else if (this.stage === "parse") {
       prefix += "parsing";
-    } else if (this.type === "codegen") {
+    } else if (this.stage === "codegen") {
       prefix += "code generation";
-    } else if (this.type === "codeEmission") {
+    } else if (this.stage === "codeEmission") {
       prefix += "code emission";
     } else {
-      // TODO: unreachable
+      unreachable(this.stage, this.stage, "Unknown compiler stage");
     }
 
     prefix += ": ";
 
     console.error(prefix + this.message);
+
+    if (this.cause) {
+      console.error(this.cause.message);
+    }
   }
 
   public reportAndExit() {

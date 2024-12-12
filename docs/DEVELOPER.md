@@ -29,7 +29,7 @@ This project contains the source, tests, and build system for my implementation 
 The main project directories:
 
 - `./src` contains the typescript files for the compiler as well as unit tests for the source files
-- `./dist` contains the compiled typescript files
+- `./dist` contains the compiled typescript files (created by `npm run build`)
 - `./bin` contains the exectuable files (these simply execute node with the js files in `./dist`)
 - `./docs` contains markdown files that explain aspects of the project
 
