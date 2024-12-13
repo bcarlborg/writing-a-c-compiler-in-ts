@@ -67,14 +67,18 @@ gcc -E -P "$INPUT_C_FILE" -o "$PREPROCESSED_FILE"
 
 # Parse the known command line options
 OPTIONS=""
+DO_NOT_LINK="false"
 if [[ "$*" == *"--lex"* ]]; then
     OPTIONS="$OPTIONS --lex"
+    DO_NOT_LINK="true"
 fi
 if [[ "$*" == *"--parse"* ]]; then
     OPTIONS="$OPTIONS --parse"
+    DO_NOT_LINK="true"
 fi
 if [[ "$*" == *"--codegen"* ]]; then
     OPTIONS="$OPTIONS --codegen"
+    DO_NOT_LINK="true"
 fi
 if [[ "$*" == *"--debug"* ]]; then
     OPTIONS="$OPTIONS --debug"
@@ -85,7 +89,7 @@ fi
 node "$INDEX_FILE" $OPTIONS --output="$ASSEMBLY_FILE" --input="$PREPROCESSED_FILE"
 
 # Only assemble and link if -S was not passed
-if [[ "$*" != *"-S"* ]]; then
+if [[ "$*" != *"-S"* ]] && [ "$DO_NOT_LINK" = "false" ]; then
     # Assemble and link by invoking GCC
     gcc -o "$EXECUTABLE_FILE" "$ASSEMBLY_FILE"
 fi

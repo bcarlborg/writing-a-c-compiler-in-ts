@@ -1,4 +1,4 @@
-import { debugLog } from "./helpers/logging";
+import { CompilerError, debugLog } from "./helpers/logging";
 
 type Token =
   | {
@@ -105,6 +105,13 @@ class Lexer {
     return this.sourceText[this.currentCharIndex + offset];
   }
 
+  private getNextCharacter(): string | undefined {
+    if (this.currentCharIndex >= this.sourceText.length) {
+      return undefined;
+    }
+    return this.sourceText[this.currentCharIndex + 1];
+  }
+
   private getStringOfNextCharacters(n: number): string {
     if (this.currentCharIndex + n >= this.sourceText.length) {
       return this.sourceText.slice(this.currentCharIndex);
@@ -149,44 +156,52 @@ class Lexer {
       const matchOpenParen = this.gobbleMatchingChars("(");
       if (matchOpenParen) {
         tokens.push({ type: "open_paren" });
+        continue;
       }
 
       const matchCloseParen = this.gobbleMatchingChars(")");
       if (matchCloseParen) {
         tokens.push({ type: "close_paren" });
+        continue;
       }
 
       const matchOpenBrace = this.gobbleMatchingChars("{");
       if (matchOpenBrace) {
         tokens.push({ type: "open_brace" });
+        continue;
       }
 
       const matchCloseBrace = this.gobbleMatchingChars("}");
       if (matchCloseBrace) {
         tokens.push({ type: "close_brace" });
+        continue;
       }
 
       const matchSemicolon = this.gobbleMatchingChars(";");
       if (matchSemicolon) {
         tokens.push({ type: "semicolon" });
+        continue;
       }
 
       const matchInt = this.gobbleMatchingChars("int");
       if (matchInt) {
         tokens.push({ type: "int" });
+        continue;
       }
 
       const matchVoid = this.gobbleMatchingChars("void");
       if (matchVoid) {
         tokens.push({ type: "void" });
+        continue;
       }
 
       const matchReturn = this.gobbleMatchingChars("return");
       if (matchReturn) {
         tokens.push({ type: "return" });
+        continue;
       }
 
-      const matchIdentifierStartingChar = this.gobbleMatchingChars(/[a-zA-Z_]/);
+      const matchIdentifierStartingChar = this.gobbleMatchingChars(/[a-zA-Z]/);
       if (matchIdentifierStartingChar) {
         const matchRemainingIdentifierChars =
           this.gobbleMatchingChars(/[a-zA-Z0-9_]/);
@@ -197,15 +212,38 @@ class Lexer {
             matchRemainingIdentifierChars || ""
           }`,
         });
+        continue;
       }
 
       const matchNumberConstant = this.gobbleMatchingChars(/[0-9]/);
       if (matchNumberConstant) {
+        const matchDecimalPoint = this.gobbleMatchingChars(".");
+        let matchRemainingNumberChars: string | undefined;
+
+        if (matchDecimalPoint) {
+          matchRemainingNumberChars = this.gobbleMatchingChars(/[0-9]/);
+          if (!matchRemainingNumberChars) {
+            throw new CompilerError("lex", "Invalid number");
+          }
+        }
+
+        const nextChar = this.getNextCharacter();
+        if (nextChar?.match(/[a-zA-Z0-9_]/)) {
+          throw new CompilerError("lex", "Invalid number");
+        }
+
         tokens.push({
           type: "constant",
-          value: parseInt(matchNumberConstant),
+          value: parseFloat(
+            `${matchNumberConstant}${matchDecimalPoint || ""}${
+              matchRemainingNumberChars || ""
+            }`
+          ),
         });
+        continue;
       }
+
+      throw new CompilerError("lex", `Unknown character: ${currentChar}`);
     }
 
     return tokens;
